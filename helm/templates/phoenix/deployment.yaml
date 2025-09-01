@@ -6,13 +6,7 @@ Validate persistence configuration to prevent conflicts
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
-  namespace: {{ .Release.Namespace | quote }}
-  labels:
-    app: {{ .Release.Name }}
-  annotations:
-    "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-weight": "2"
+  name: {{ include "phoenix.fullname" . }}
 spec:
   replicas: {{ .Values.replicaCount | default 1 }}
   {{- if .Values.deployment.strategy }}
@@ -21,11 +15,11 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: {{ include "phoenix.fullname" . }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: {{ include "phoenix.fullname" . }}
     spec:
       {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
       serviceAccountName: {{ .Values.serviceAccount.name | default .Release.Name }}
@@ -79,7 +73,7 @@ spec:
           {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ .Release.Name }}-configmap
+                name: {{ include "phoenix.fullname" . }}-configmap
           {{- if or .Values.auth.secret (and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers) }}
           env:
           {{- if .Values.auth.secret }}
@@ -137,7 +131,7 @@ spec:
         {{- if and (.Values.persistence.enabled | toString | eq "true") (not $isMemoryDatabase) }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-data-pvc
+            claimName: {{ include "phoenix.fullname" . }}-data-pvc
         {{- else }}
         - name: data
           emptyDir: {}

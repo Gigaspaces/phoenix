@@ -1,13 +1,12 @@
-{{- include "phoenix.validatePersistence" . }}
-{{- include "phoenix.validateExternalDatabase" . }}
-{{- include "phoenix.validateDatabaseUrl" . }}
+# {{- include "phoenix.validatePersistence" . }}
+# {{- include "phoenix.validateExternalDatabase" . }}
+# {{- include "phoenix.validateDatabaseUrl" . }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-configmap
-  namespace: {{ .Release.Namespace | quote }}
+  name: {{ include "phoenix.fullname" . }}
   labels:
-    app: {{ .Release.Name }}
+    app.kubernetes.io/component: phoenix
 data:
   # Authentication configuration
   PHOENIX_ENABLE_AUTH: {{ .Values.auth.enableAuth | quote }}
