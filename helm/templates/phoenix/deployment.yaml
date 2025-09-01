@@ -73,7 +73,7 @@ spec:
           {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ include "phoenix.fullname" . }}-configmap
+                name: {{ include "phoenix.fullname" . }}
           {{- if or .Values.auth.secret (and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers) }}
           env:
           {{- if .Values.auth.secret }}
