@@ -74,15 +74,22 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "phoenix.fullname" . }}
-          {{- if or .Values.auth.secret (and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers) }}
+          {{- if or .Values.auth.secret (and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers) true }}
           env:
+            - name: PHOENIX_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: evaluator.erag-evaluator-pg-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do
+                  key: password
           {{- if .Values.auth.secret }}
           {{- range $authSecrets := .Values.auth.secret }}
+          {{- if ne $authSecrets.key "PHOENIX_POSTGRES_PASSWORD" }}
             - name: {{ $authSecrets.key }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $.Values.auth.name }}
                   key: {{ $authSecrets.key }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- if and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers }}
@@ -98,12 +105,6 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
-          env:
-            - name: PHOENIX_POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: evaluator.erag-evaluator-pg-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do
-                  key: password
 
           volumeMounts:
             {{- if and .Values.securityContext.container.enabled .Values.securityContext.container.readOnlyRootFilesystem }}
