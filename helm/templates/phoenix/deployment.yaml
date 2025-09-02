@@ -71,12 +71,6 @@ spec:
             failureThreshold: {{ .Values.healthChecks.startupProbe.failureThreshold | default 30 }}
             successThreshold: {{ .Values.healthChecks.startupProbe.successThreshold | default 1 }}
           {{- end }}
-           env:
-            - name: PHOENIX_POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: evaluator.erag-evaluator-pg-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do
-                  key: password
           envFrom:
             - configMapRef:
                 name: {{ include "phoenix.fullname" . }}
@@ -104,6 +98,12 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
+          env:
+            - name: PHOENIX_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: evaluator.erag-evaluator-pg-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do
+                  key: password
 
           volumeMounts:
             {{- if and .Values.securityContext.container.enabled .Values.securityContext.container.readOnlyRootFilesystem }}
