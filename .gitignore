@@ -85,6 +85,6 @@ packages/phoenix-client/docs/build/
 packages/phoenix-evals/docs/build/
 
 # Deployment
-helm/charts/*.tgz
+**/*.tgz
 # mypy
 .mypy_cache
