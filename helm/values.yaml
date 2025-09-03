@@ -167,7 +167,7 @@ service:
   # -- Service type for Phoenix service (ClusterIP, NodePort, LoadBalancer, or ExternalName)
   # Use ClusterIP for service mesh deployments (Istio, Linkerd, etc.)
   # Use NodePort for direct external access without ingress
-  type: "NodePort"
+  type: "ClusterIP"
 
   # -- Annotations to add to the Phoenix service (useful for service mesh configurations)
   annotations:
