@@ -33,7 +33,7 @@ ingress:
   apiPath: "/api/phoenix/"
 
   # -- Enable ingress controller for external access
-  enabled: true
+  enabled: false
 
   # -- Hostname for ingress
   host: ""
@@ -42,7 +42,7 @@ ingress:
   labels: {}
 
   # -- Ingress path type (Prefix, Exact, or ImplementationSpecific)
-  pathType: "Prefix"
+  pathType: "ImplementationSpecific"
 
   tls:
     # -- Enable TLS/HTTPS for ingress
