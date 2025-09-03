@@ -30,7 +30,7 @@ ingress:
   annotations: {}
 
   # -- Path prefix for the Phoenix API
-  apiPath: "/"
+  apiPath: "/api/phoenix/"
 
   # -- Enable ingress controller for external access
   enabled: true
