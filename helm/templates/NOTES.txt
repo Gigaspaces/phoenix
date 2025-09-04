@@ -40,7 +40,7 @@ Admin credentials:
 {{- if .Values.auth.secret }}
   Username: admin
   Password: To get the admin password run:
-    kubectl get secret --namespace {{ .Release.Namespace }} "{{ .Values.auth.name }}-{{ include phoenix.fullname }}" -o jsonpath="{.data.PHOENIX_DEFAULT_ADMIN_INITIAL_PASSWORD}" | base64 -d
+    kubectl get secret --namespace {{ .Release.Namespace }} "{{ .Values.auth.name }}-{{ include "phoenix.fullname" . }}" -o jsonpath="{.data.PHOENIX_DEFAULT_ADMIN_INITIAL_PASSWORD}" | base64 -d
 
 {{- end }}
 {{- end }}

@@ -2,6 +2,12 @@
 # This file contains configuration values for deploying Phoenix via Helm.
 # Each value corresponds to an environment variable described in https://arize.com/docs/phoenix/self-hosting/configuration.
 
+# Chart name overrides
+# -- Override the name of the chart
+nameOverride: ""
+# -- Override the full name of the chart
+fullnameOverride: ""
+
 # Replica count
 # -- Number of Phoenix pod replicas
 replicaCount: 1
