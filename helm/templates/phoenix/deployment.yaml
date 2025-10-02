@@ -7,6 +7,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "phoenix.fullname" . }}
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: {{ .Values.replicaCount | default 1 }}
   {{- if .Values.deployment.strategy }}
@@ -134,7 +136,7 @@ spec:
         - name: home-volume
           emptyDir: {}
         {{- end }}
-        {{- $isMemoryDatabase := .Values.persistence.inMemory | toString | eq "true" }} 
+        {{- $isMemoryDatabase := .Values.persistence.inMemory | toString | eq "true" }}
         {{- if and (.Values.persistence.enabled | toString | eq "true") (not $isMemoryDatabase) }}
         - name: data
           persistentVolumeClaim:
