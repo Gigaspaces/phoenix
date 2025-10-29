@@ -88,3 +88,7 @@ packages/phoenix-evals/docs/build/
 helm/charts/*.tgz
 # mypy
 .mypy_cache
+
+# Local workflow tools
+.swarm/
+.claude-flow/
