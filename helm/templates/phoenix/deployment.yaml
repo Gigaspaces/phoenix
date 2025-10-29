@@ -6,10 +6,9 @@ Validate persistence configuration to prevent conflicts
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
-  namespace: {{ .Release.Namespace | quote }}
-  labels:
-    app: {{ .Release.Name }}
+  name: {{ include "phoenix.fullname" . }}
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: {{ .Values.replicaCount | default 1 }}
   {{- if .Values.deployment.strategy }}
@@ -18,11 +17,11 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: {{ include "phoenix.fullname" . }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: {{ include "phoenix.fullname" . }}
     spec:
       {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
       serviceAccountName: {{ .Values.serviceAccount.name | default .Release.Name }}
@@ -32,7 +31,7 @@ spec:
       {{- end }}
       containers:
         - name: phoenix
-          image: {{ .Values.image.registry }}/{{ .Values.image.repository | default "arizephoenix/phoenix" }}:{{ .Values.image.tag | default "latest" }}
+          image: {{ .Values.image.repository | default "arizephoenix/phoenix" }}:{{ .Values.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           {{- if .Values.securityContext.container.enabled }}
           securityContext: {{- omit .Values.securityContext.container "enabled" | toYaml | nindent 12 }}
@@ -76,16 +75,23 @@ spec:
           {{- end }}
           envFrom:
             - configMapRef:
-                name: {{ .Release.Name }}-configmap
-          {{- if or .Values.auth.secret (and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers) }}
+                name: {{ include "phoenix.fullname" . }}
+          {{- if or .Values.auth.secret (and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers) true }}
           env:
+            - name: PHOENIX_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: evaluator.erag-evaluator-pg-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do
+                  key: password
           {{- if .Values.auth.secret }}
           {{- range $authSecrets := .Values.auth.secret }}
+          {{- if ne $authSecrets.key "PHOENIX_POSTGRES_PASSWORD" }}
             - name: {{ $authSecrets.key }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ $.Values.auth.name }}
+                  name: "{{ include "phoenix.fullname" $ }}-{{ $.Values.auth.name }}"
                   key: {{ $authSecrets.key }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- if and .Values.auth.oauth2.enabled .Values.auth.oauth2.providers }}
@@ -95,7 +101,7 @@ spec:
             - name: PHOENIX_OAUTH2_{{ $provider_upper }}_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ $.Values.auth.name }}
+                  name: "{{ include "phoenix.fullname" $ }}-{{ $.Values.auth.name }}"
                   key: PHOENIX_OAUTH2_{{ $provider_upper }}_CLIENT_SECRET
           {{- end }}
           {{- end }}
@@ -130,11 +136,11 @@ spec:
         - name: home-volume
           emptyDir: {}
         {{- end }}
-        {{- $isMemoryDatabase := .Values.persistence.inMemory | toString | eq "true" }} 
+        {{- $isMemoryDatabase := .Values.persistence.inMemory | toString | eq "true" }}
         {{- if and (.Values.persistence.enabled | toString | eq "true") (not $isMemoryDatabase) }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-data-pvc
+            claimName: {{ include "phoenix.fullname" . }}-data-pvc
         {{- else }}
         - name: data
           emptyDir: {}
